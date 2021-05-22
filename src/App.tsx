@@ -1,9 +1,11 @@
 import { ChangeEvent, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { styled, global } from '@stitches/react';
+import { styled } from '@stitches/react';
+import { globalStyle } from './globalStyle';
 import gfm from 'remark-gfm';
 import ReactJson from 'react-json-view';
 import useInterval from '@use-it/interval';
+import { directive, markdownDirective } from './markdownDirective';
 
 const Grid = styled('div', {
   display: 'grid',
@@ -39,17 +41,18 @@ const Preview = styled('div', {
   wordBreak: 'break-all',
 });
 
-const globalStyle = global({
-  '*': {
-    boxSizing: 'border-box',
-  },
-});
-
 const Setting = styled('div', {
   padding: '1rem',
   overflow: 'scroll',
   wordBreak: 'break-all',
 });
+
+const REMARK_PLUGIN_NAMES = {
+  DIRECTIVE: 'directive',
+  MARKDOWN_DIRECTIVE: 'markdownDirective',
+  GFM: 'gfm',
+  LOG: 'log',
+} as const;
 
 function App() {
   globalStyle();
@@ -73,14 +76,35 @@ function App() {
   const pluginMap = {
     log,
     gfm,
+    directive,
+    markdownDirective,
   };
-  const [remarkPlugins, updateRemarkPlugins] = useState<string[]>(['log']);
+  const [remarkPlugins, updateRemarkPlugins] = useState<string[]>([
+    REMARK_PLUGIN_NAMES.LOG,
+  ]);
   const handleUpdateRemarkPlugins = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     if (remarkPlugins.includes(value)) {
-      updateRemarkPlugins(remarkPlugins.filter((plugin) => plugin !== value));
+      if (value === REMARK_PLUGIN_NAMES.MARKDOWN_DIRECTIVE) {
+        updateRemarkPlugins(
+          remarkPlugins.filter(
+            (plugin) =>
+              plugin !== value && plugin !== REMARK_PLUGIN_NAMES.DIRECTIVE
+          )
+        );
+      } else {
+        updateRemarkPlugins(remarkPlugins.filter((plugin) => plugin !== value));
+      }
     } else {
-      updateRemarkPlugins([...remarkPlugins, value]);
+      if (value === 'markdownDirective') {
+        updateRemarkPlugins([
+          REMARK_PLUGIN_NAMES.DIRECTIVE,
+          value,
+          ...remarkPlugins,
+        ]);
+      } else {
+        updateRemarkPlugins([value, ...remarkPlugins]);
+      }
     }
   };
 
@@ -88,12 +112,25 @@ function App() {
     <div className="App">
       <Grid>
         <Setting>
-          <input
-            type="checkbox"
-            value="gfm"
-            onChange={handleUpdateRemarkPlugins}
-          />
-          <label>gfm</label>
+          <h2>remarkPlugins</h2>
+          <ul>
+            <li>
+              <input
+                type="checkbox"
+                value={REMARK_PLUGIN_NAMES.GFM}
+                onChange={handleUpdateRemarkPlugins}
+              />
+              <label>{REMARK_PLUGIN_NAMES.GFM}</label>
+            </li>
+            <li>
+              <input
+                type="checkbox"
+                value={REMARK_PLUGIN_NAMES.MARKDOWN_DIRECTIVE}
+                onChange={handleUpdateRemarkPlugins}
+              />
+              <label>{REMARK_PLUGIN_NAMES.MARKDOWN_DIRECTIVE}</label>
+            </li>
+          </ul>
         </Setting>
         <Editor>
           <Textarea value={value} onChange={handleUpdateValue} />
