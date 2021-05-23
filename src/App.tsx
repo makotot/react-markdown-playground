@@ -6,6 +6,7 @@ import gfm from 'remark-gfm';
 import ReactJson from 'react-json-view';
 import useInterval from '@use-it/interval';
 import { directive, markdownDirective } from './markdownDirective';
+import sectionize from 'remark-sectionize';
 
 const Grid = styled('div', {
   display: 'grid',
@@ -51,6 +52,7 @@ const REMARK_PLUGIN_NAMES = {
   DIRECTIVE: 'directive',
   MARKDOWN_DIRECTIVE: 'markdownDirective',
   GFM: 'gfm',
+  SECTIONIZE: 'sectionize',
   LOG: 'log',
 } as const;
 
@@ -78,6 +80,7 @@ function App() {
     gfm,
     directive,
     markdownDirective,
+    sectionize,
   };
   const [remarkPlugins, updateRemarkPlugins] = useState<string[]>([
     REMARK_PLUGIN_NAMES.LOG,
@@ -129,6 +132,14 @@ function App() {
                 onChange={handleUpdateRemarkPlugins}
               />
               <label>{REMARK_PLUGIN_NAMES.MARKDOWN_DIRECTIVE}</label>
+            </li>
+            <li>
+              <input
+                type="checkbox"
+                value={REMARK_PLUGIN_NAMES.SECTIONIZE}
+                onChange={handleUpdateRemarkPlugins}
+              />
+              <label>{REMARK_PLUGIN_NAMES.SECTIONIZE}</label>
             </li>
           </ul>
         </Setting>
