@@ -7,6 +7,7 @@ import ReactJson from 'react-json-view';
 import useInterval from '@use-it/interval';
 import { directive, markdownDirective } from './markdownDirective';
 import sectionize from 'remark-sectionize';
+import { termRange } from './term-range';
 
 const Grid = styled('div', {
   display: 'grid',
@@ -54,6 +55,7 @@ const REMARK_PLUGIN_NAMES = {
   GFM: 'gfm',
   SECTIONIZE: 'sectionize',
   LOG: 'log',
+  TERM_RANGE: 'termRange',
 } as const;
 
 function App() {
@@ -81,6 +83,7 @@ function App() {
     directive,
     markdownDirective,
     sectionize,
+    termRange,
   };
   const [remarkPlugins, updateRemarkPlugins] = useState<string[]>([
     REMARK_PLUGIN_NAMES.LOG,
@@ -140,6 +143,14 @@ function App() {
                 onChange={handleUpdateRemarkPlugins}
               />
               <label>{REMARK_PLUGIN_NAMES.SECTIONIZE}</label>
+            </li>
+            <li>
+              <input
+                type="checkbox"
+                value={REMARK_PLUGIN_NAMES.TERM_RANGE}
+                onChange={handleUpdateRemarkPlugins}
+              />
+              <label>{REMARK_PLUGIN_NAMES.TERM_RANGE}</label>
             </li>
           </ul>
         </Setting>
